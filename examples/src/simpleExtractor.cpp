@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "gw2DatTools/interface/ANDatInterface.h"
-#include "gw2DatTools/compression/inflateBuffer.h"
+#include "gw2DatTools/compression/inflateDatFileBuffer.h"
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     for (auto it = aFileRecordVect.begin(); it != aFileRecordVect.end(); ++it)
     {
         uint32_t aOriSize = aBufferSize;
-        pANDatInterface->getBuffer(*it, pOriBuffer, aOriSize);
+        pANDatInterface->getBuffer(*it, aOriSize, pOriBuffer);
 
         std::ostringstream aStringstream;
         aStringstream << "F:\\unpack\\";
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
             
             try
             {
-                gw2dt::compression::inflateBuffer(pOriBuffer, aOriSize, aInfSize, pInfBuffer);
+                gw2dt::compression::inflateDatFileBuffer(aOriSize, pOriBuffer, aInfSize, pInfBuffer);
 
                 aStream.write(reinterpret_cast<char*>(pInfBuffer), aInfSize);
             }

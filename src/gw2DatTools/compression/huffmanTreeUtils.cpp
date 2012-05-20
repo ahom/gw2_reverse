@@ -1,4 +1,4 @@
-#include "inflateBufferUtils.h"
+#include "huffmanTreeUtils.h"
 
 #include <memory.h>
 
