@@ -346,7 +346,7 @@ static parseStruct(iAddress, iParsedStructsId, iOutputFile)
 
 static parseStructTab(iANSTructTabOffset, iNbOfVersions, iOutputFile)
 {
-    auto aCurrentAddress, aLoopIndex, aParsedStructsId;
+    auto aCurrentAddress, aLoopIndex, aParsedStructsId, aSubAddress;
     
     aLoopIndex = iNbOfVersions - 1;
     aCurrentAddress = iANSTructTabOffset;
@@ -357,9 +357,17 @@ static parseStructTab(iANSTructTabOffset, iNbOfVersions, iOutputFile)
         aParsedStructsId = CreateArray("PARSED_STRUCTS");
         
         aCurrentAddress = Dword(iANSTructTabOffset + 12 * aLoopIndex);
+		aSubAddress = Dword(iANSTructTabOffset + 12 * aLoopIndex + 4);
         if (aCurrentAddress !=0)
         {
-            fprintf(iOutputFile, "=> Version: %d\n", aLoopIndex);
+			if (aSubAddress != 0)
+			{
+				fprintf(iOutputFile, "=> Version: %d, ReferencedFunction: 0x%X\n", aLoopIndex, aSubAddress);
+			}
+			else
+			{
+				fprintf(iOutputFile, "=> Version: %d\n", aLoopIndex);
+			}
             parseStruct(aCurrentAddress, aParsedStructsId, iOutputFile);
         }
         aLoopIndex = aLoopIndex - 1;
@@ -449,7 +457,7 @@ static main(void)
                             add(aParsedTablesId, aANSTructTabOffset);
                             
                             fprintf(aOutputFile, "==================================================\n");
-                            fprintf(aOutputFile, " Chunk: %s, versions: %d, strucTab: %X\n", aChunkName, aNbOfVersions, aANSTructTabOffset);
+                            fprintf(aOutputFile, " Chunk: %s, versions: %d, strucTab: 0x%X\n", aChunkName, aNbOfVersions, aANSTructTabOffset);
                             fprintf(aOutputFile, "==================================================\n");
                             parseStructTab(aANSTructTabOffset, aNbOfVersions, aOutputFile);
                             fprintf(aOutputFile, "\n");
