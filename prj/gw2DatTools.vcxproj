@@ -81,22 +81,21 @@
   <ItemGroup>
     <ClCompile Include="..\src\gw2DatTools\compression\huffmanTreeUtils.cpp" />
     <ClCompile Include="..\src\gw2DatTools\compression\inflateDatFileBuffer.cpp" />
+    <ClCompile Include="..\src\gw2DatTools\compression\inflateTextureFileBuffer.cpp" />
     <ClCompile Include="..\src\gw2DatTools\c_api\compression_inflateDatFileBuffer.cpp" />
     <ClCompile Include="..\src\gw2DatTools\exception\Exception.cpp" />
     <ClCompile Include="..\src\gw2DatTools\format\ANDat.cpp" />
     <ClCompile Include="..\src\gw2DatTools\format\Mapping.cpp" />
     <ClCompile Include="..\src\gw2DatTools\format\Mft.cpp" />
     <ClCompile Include="..\src\gw2DatTools\interface\ANDatInterface.cpp" />
-    <ClCompile Include="..\src\gw2DatTools\usecase\DeduceFileType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gw2DatTools\compression\inflateDatFileBuffer.h" />
+    <ClInclude Include="..\include\gw2DatTools\compression\inflateTextureFileBuffer.h" />
     <ClInclude Include="..\include\gw2DatTools\c_api\compression_inflateDatFileBuffer.h" />
     <ClInclude Include="..\include\gw2DatTools\dllMacros.h" />
     <ClInclude Include="..\include\gw2DatTools\exception\Exception.h" />
-    <ClInclude Include="..\include\gw2DatTools\format\FileType.h" />
     <ClInclude Include="..\include\gw2DatTools\interface\ANDatInterface.h" />
-    <ClInclude Include="..\include\gw2DatTools\usecase\DeduceFileType.h" />
     <ClInclude Include="..\src\gw2DatTools\compression\huffmanTreeUtils.h" />
     <ClInclude Include="..\src\gw2DatTools\format\ANDat.h" />
     <ClInclude Include="..\src\gw2DatTools\format\Mapping.h" />

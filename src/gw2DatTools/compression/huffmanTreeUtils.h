@@ -36,6 +36,8 @@ struct State
     uint32_t head;
     uint32_t buffer;
     uint8_t bits;
+
+	bool isEmpty;
 };
 
 void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab);
@@ -59,14 +61,25 @@ inline void pullByte(State& ioState)
         ++(ioState.inputPos);
     }
 
+	// Fetching the next value
+    uint32_t aValue = 0;
+
     // checking that inputPos is not out of bounds
     if (ioState.inputPos >= ioState.inputSize)
     {
-        throw exception::Exception("Reached end of input while trying to fetch a new byte.");
+		if (ioState.isEmpty)
+		{
+			throw exception::Exception("Reached end of input while trying to fetch a new byte.");
+		}
+		else
+		{
+			ioState.isEmpty = true;
+		}
     }
-
-    // Fetching the next value
-    uint32_t aValue = ioState.input[ioState.inputPos];
+	else
+	{
+		aValue = ioState.input[ioState.inputPos];
+	}
 
     // Pulling the data into head/buffer given that we need to keep the relevant bits
     if (ioState.bits == 0)

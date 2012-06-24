@@ -10,12 +10,14 @@ namespace gw2dt
 {
 namespace compression
 {
+namespace dat
+{
 
 // Static HuffmanTreeDict
-HuffmanTree sHuffmanTreeDict;
-bool sHuffmanTreeDictInitialized(false);
+HuffmanTree sDatFileHuffmanTreeDict;
+bool sDatFileHuffmanTreeDictInitialized(false);
 
-void inflateDatFileBuffer_initializeHuffmanTreeDict()
+void initializeHuffmanTreeDict()
 {
     int16_t aWorkingBitTab[MaxCodeBitsLength];
     int16_t aWorkingCodeTab[MaxSymbolValue];
@@ -294,11 +296,11 @@ void inflateDatFileBuffer_initializeHuffmanTreeDict()
     fillWorkingTabsHelper(16, 0x13, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
     fillWorkingTabsHelper(16, 0x12, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
 
-    return buildHuffmanTree(sHuffmanTreeDict, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
+    return buildHuffmanTree(sDatFileHuffmanTreeDict, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
 }
 
 // Parse and build a huffmanTree
-void inflateDatFileBuffer_parseHuffmanTree(State& ioState, HuffmanTree& ioHuffmanTree)
+void parseHuffmanTree(State& ioState, HuffmanTree& ioHuffmanTree)
 {
     // Reading the number of symbols to read
     needBits(ioState, 16);
@@ -323,7 +325,7 @@ void inflateDatFileBuffer_parseHuffmanTree(State& ioState, HuffmanTree& ioHuffma
     while (aRemainingSymbols > -1)
     {
         uint16_t aCode = 0;
-        readCode(sHuffmanTreeDict, ioState, aCode);
+        readCode(sDatFileHuffmanTreeDict, ioState, aCode);
 
         uint16_t aCodeNumberOfBits = aCode & 0x1F;
         uint16_t aCodeNumberOfSymbols = (aCode >> 5) + 1;
@@ -355,7 +357,7 @@ void inflateDatFileBuffer_parseHuffmanTree(State& ioState, HuffmanTree& ioHuffma
     return buildHuffmanTree(ioHuffmanTree, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
 }
 
-void inflateDatFileBuffer_data(State& ioState,const uint32_t iOutputSize,  uint8_t* ioOutputTab)
+void inflatedata(State& ioState,const uint32_t iOutputSize,  uint8_t* ioOutputTab)
 {
     uint32_t anOutputPos = 0;
 
@@ -372,8 +374,8 @@ void inflateDatFileBuffer_data(State& ioState,const uint32_t iOutputSize,  uint8
     while (anOutputPos < iOutputSize)
     {
         // Reading HuffmanTrees
-        inflateDatFileBuffer_parseHuffmanTree(ioState, aHuffmanTreeSymbol);
-        inflateDatFileBuffer_parseHuffmanTree(ioState, aHuffmanTreeCopy);
+        parseHuffmanTree(ioState, aHuffmanTreeSymbol);
+        parseHuffmanTree(ioState, aHuffmanTreeCopy);
 
         // Reading MaxCount
         needBits(ioState, 4);
@@ -474,6 +476,7 @@ void inflateDatFileBuffer_data(State& ioState,const uint32_t iOutputSize,  uint8
         }
     }
 }
+}
 
 GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(const uint32_t iInputSize, uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
 {
@@ -492,10 +495,10 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(const uint32_
 
     try
     {
-        if (!sHuffmanTreeDictInitialized)
+        if (!dat::sDatFileHuffmanTreeDictInitialized)
         {
-            inflateDatFileBuffer_initializeHuffmanTreeDict();
-            sHuffmanTreeDictInitialized = true;
+            dat::initializeHuffmanTreeDict();
+            dat::sDatFileHuffmanTreeDictInitialized = true;
         }
         
         // Initialize state
@@ -507,6 +510,8 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(const uint32_
         aState.head = 0;
         aState.bits = 0;
         aState.buffer = 0;
+
+		aState.isEmpty = false;
 
         // Skipping header & Getting size of the uncompressed data
         needBits(aState, 32);
@@ -534,7 +539,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(const uint32_
             anOutputTab = ioOutputTab;
         }
 
-        inflateDatFileBuffer_data(aState, anOutputSize, anOutputTab);
+        dat::inflatedata(aState, anOutputSize, anOutputTab);
         
         return anOutputTab;
     }

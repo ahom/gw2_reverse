@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     auto pANDatInterface = gw2dt::interface::createANDatInterface("F:\\GuildWars2\\Gw2.dat");
 
 	std::cout << "Getting FileRecord Id" << std::endl;
-    auto aFileRecord = pANDatInterface->getFileRecordForFileId(105657);
+    auto aFileRecord = pANDatInterface->getFileRecordForFileId(184790);
     
     uint8_t* pOriBuffer = new uint8_t[aBufferSize];
     uint8_t* pInfBuffer = new uint8_t[aBufferSize];
@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
 	if (aFileRecord.isCompressed)
 	{
 		uint32_t aInfSize = aBufferSize;
+		std::cout << "Compressed." << std::endl;
 		
 		try
 		{
@@ -57,14 +58,16 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
+		std::cout << "Not compressed." << std::endl;
 		pAtexBuffer = pOriBuffer;
 		aAtexBufferSize = aOriSize;
 	}
 
 	try
 	{
+		std::cout << "aAtexBufferSize: " << aAtexBufferSize << std::endl;
 		uint32_t aOutSize = aBufferSize;
-		gw2dt::compression::TEST_inflateTextureFileBuffer(aOriSize, pAtexBuffer, aOutSize, pOutBuffer);
+		gw2dt::compression::inflateTextureFileBuffer(aAtexBufferSize, pAtexBuffer, aOutSize, pOutBuffer);
 
 		aStream.write(reinterpret_cast<char*>(pOutBuffer), aOutSize);
 	}

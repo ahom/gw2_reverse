@@ -7,11 +7,10 @@
 #else
 #define GW2DATTOOLS_API __declspec(dllimport)
 #endif
-
 #define GW2DATTOOLS_APIENTRY __stdcall
-#endif
-
+#else
 #define GW2DATTOOLS_API
 #define GW2DATTOOLS_APIENTRY
+#endif
 
 #endif // GW2RE_CORETOOLS_DLLMACROS_H
