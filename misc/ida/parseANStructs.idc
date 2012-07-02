@@ -1,6 +1,6 @@
 #include <idc.idc>
 
-#define IS_ASCII(a) (((Byte(a) >= 65) && (Byte(a) <= 90)) || ((Byte(a) >= 97) && (Byte(a) <= 122)))
+#define IS_ASCII(a) (((Byte(a) >= 48) && (Byte(a) <= 57)) || ((Byte(a) >= 65) && (Byte(a) <= 90)) || ((Byte(a) >= 97) && (Byte(a) <= 122)))
 
 static getAsciiName(iAddress)
 {

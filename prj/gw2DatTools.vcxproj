@@ -76,6 +76,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\src\gw2DatTools\compression\HuffmanTree.i" />
+    <None Include="..\src\gw2DatTools\utils\BitArray.i" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -96,11 +98,13 @@
     <ClInclude Include="..\include\gw2DatTools\dllMacros.h" />
     <ClInclude Include="..\include\gw2DatTools\exception\Exception.h" />
     <ClInclude Include="..\include\gw2DatTools\interface\ANDatInterface.h" />
+    <ClInclude Include="..\src\gw2DatTools\compression\HuffmanTree.h" />
     <ClInclude Include="..\src\gw2DatTools\compression\huffmanTreeUtils.h" />
     <ClInclude Include="..\src\gw2DatTools\format\ANDat.h" />
     <ClInclude Include="..\src\gw2DatTools\format\Mapping.h" />
     <ClInclude Include="..\src\gw2DatTools\format\Mft.h" />
     <ClInclude Include="..\src\gw2DatTools\format\Utils.h" />
+    <ClInclude Include="..\src\gw2DatTools\utils\BitArray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,10 +9,12 @@
 
 int main(int argc, char* argv[])
 {
-    const uint32_t aBufferSize = 1024 * 1024 * 30; // We make the assumption that no file is bigger than 30 Mo
-    
-    auto pANDatInterface = gw2dt::interface::createANDatInterface("F:\\GuildWars2\\Gw2.dat");
+    std::cout << "Allo" << std::endl;
+    const uint32_t aBufferSize = 1024 * 1024 * 30; // We make the assumption that no file is bigger than 30 M
 
+    auto pANDatInterface = gw2dt::interface::createANDatInterface("D:\\projects\\data\\Gw2.dat");
+    
+    std::cout << "Allo" << std::endl;
     auto aFileRecordVect = pANDatInterface->getFileRecordVect();
     
     uint8_t* pOriBuffer = new uint8_t[aBufferSize];
@@ -22,13 +24,14 @@ int main(int argc, char* argv[])
     {
         uint32_t aOriSize = aBufferSize;
         pANDatInterface->getBuffer(*it, aOriSize, pOriBuffer);
+        
+        std::cout << "Decompressing File " << it->fileId << std::endl;
 
-        std::ostringstream aStringstream;
-        aStringstream << "F:\\unpack\\";
-        aStringstream << it->fileId;
-        
-        std::ofstream aStream(aStringstream.str(), std::ios::binary);
-        
+        std::ofstream aOFStream;
+        std::ostringstream oss;
+        oss << "D:\\unpack\\" << it->fileId;
+        aOFStream.open(oss.str().c_str(), std::ios::binary | std::ios::out);
+
         if (aOriSize == aBufferSize)
         {
             std::cout << "File " << it->fileId << " has a size greater than (or equal to) 30Mo." << std::endl;
@@ -41,8 +44,7 @@ int main(int argc, char* argv[])
             try
             {
                 gw2dt::compression::inflateDatFileBuffer(aOriSize, pOriBuffer, aInfSize, pInfBuffer);
-
-                aStream.write(reinterpret_cast<char*>(pInfBuffer), aInfSize);
+                aOFStream.write(reinterpret_cast<const char*>(pInfBuffer), aInfSize);
             }
             catch(std::exception& iException)
             {
@@ -51,14 +53,14 @@ int main(int argc, char* argv[])
         }
         else
         {
-            aStream.write(reinterpret_cast<char*>(pOriBuffer), aOriSize);
+            aOFStream.write(reinterpret_cast<const char*>(pOriBuffer), aOriSize);
         }
 
-        aStream.close();
+        aOFStream.close();
     }
 
     delete[] pOriBuffer;
     delete[] pInfBuffer;
-
+    
     return 0;
 };

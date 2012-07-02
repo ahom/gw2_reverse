@@ -16,6 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="..\src\gw2DatTools\compression\HuffmanTree.i" />
+    <None Include="..\src\gw2DatTools\utils\BitArray.i" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\gw2DatTools\compression\huffmanTreeUtils.cpp">
@@ -78,6 +80,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gw2DatTools\compression\inflateTextureFileBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gw2DatTools\compression\HuffmanTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gw2DatTools\utils\BitArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,11 +8,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simpleExtractor", "..\examp
 		{81D81E5A-8FEC-4F92-B661-69D6B4C9DC8D} = {81D81E5A-8FEC-4F92-B661-69D6B4C9DC8D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "..\examples\prj\test.vcxproj", "{C02A0201-F25A-C9B7-E8A7-0E13ADA0B732}"
-	ProjectSection(ProjectDependencies) = postProject
-		{81D81E5A-8FEC-4F92-B661-69D6B4C9DC8D} = {81D81E5A-8FEC-4F92-B661-69D6B4C9DC8D}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -27,10 +22,6 @@ Global
 		{9142457D-C99C-4346-9197-044B46FF5527}.Debug|Win32.Build.0 = Debug|Win32
 		{9142457D-C99C-4346-9197-044B46FF5527}.Release|Win32.ActiveCfg = Release|Win32
 		{9142457D-C99C-4346-9197-044B46FF5527}.Release|Win32.Build.0 = Release|Win32
-		{C02A0201-F25A-C9B7-E8A7-0E13ADA0B732}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C02A0201-F25A-C9B7-E8A7-0E13ADA0B732}.Debug|Win32.Build.0 = Debug|Win32
-		{C02A0201-F25A-C9B7-E8A7-0E13ADA0B732}.Release|Win32.ActiveCfg = Release|Win32
-		{C02A0201-F25A-C9B7-E8A7-0E13ADA0B732}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

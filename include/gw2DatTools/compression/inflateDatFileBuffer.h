@@ -26,7 +26,7 @@ namespace compression
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(const uint32_t iInputSize, uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 }
 }

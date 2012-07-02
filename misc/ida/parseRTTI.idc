@@ -497,7 +497,7 @@ static main(void)
                     {
                         if (isUnknown(GetFlags(aMiscAddress)))
                         {
-                            if (!MakeFunction(aMiscAddress))
+                            if (!MakeFunction(aMiscAddress, BADADDR))
                             {
                                 break;
                             }
