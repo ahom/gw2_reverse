@@ -32,7 +32,7 @@ template <typename IntType>
 void HuffmanTree<SymbolType, sNbBitsHash, sMaxCodeBitsLength, sMaxSymbolValue>::readCode(utils::BitArray<IntType>& iBitArray, SymbolType& oSymbol) const
 {
     uint32_t aHashValue;
-    iBitArray.readLazy<uint32_t, sNbBitsHash>(aHashValue);
+    iBitArray.readLazy<sNbBitsHash>(aHashValue);
     
     if (_symbolValueHashExistenceArray[aHashValue])
     {
@@ -89,9 +89,29 @@ void HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::addSym
 template <typename SymbolType, 
           uint8_t sMaxCodeBitsLength,
           uint16_t sMaxSymbolValue>
-template <uint8_t sNbBitsHash>
-void HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::buildHuffmanTree(HuffmanTree<SymbolType, sNbBitsHash, sMaxCodeBitsLength, sMaxSymbolValue>& oHuffmanTree)
+bool HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::empty() const
 {
+    for (auto it = _symbolListByBitsHeadExistenceArray.begin(); it != _symbolListByBitsHeadExistenceArray.end(); ++it)
+    {
+        if (*it == true)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename SymbolType, 
+          uint8_t sMaxCodeBitsLength,
+          uint16_t sMaxSymbolValue>
+template <uint8_t sNbBitsHash>
+bool HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::buildHuffmanTree(HuffmanTree<SymbolType, sNbBitsHash, sMaxCodeBitsLength, sMaxSymbolValue>& oHuffmanTree)
+{
+    if (empty())
+    {
+        return false;
+    }
+    
     oHuffmanTree.clear();
     
     // Building the HuffmanTree
@@ -169,6 +189,8 @@ void HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::buildH
         aCode = (aCode << 1) + 1;
         ++aNbBits;
     }
+    
+    return true;
 }
 
 }

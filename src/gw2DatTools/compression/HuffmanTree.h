@@ -53,9 +53,11 @@ class HuffmanTreeBuilder
         void addSymbol(SymbolType iSymbol, uint8_t iNbBits);
         
         template <uint8_t sNbBitsHash>
-        void buildHuffmanTree(HuffmanTree<SymbolType, sNbBitsHash, sMaxCodeBitsLength, sMaxSymbolValue>& oHuffmanTree);
+        bool buildHuffmanTree(HuffmanTree<SymbolType, sNbBitsHash, sMaxCodeBitsLength, sMaxSymbolValue>& oHuffmanTree);
         
     private:
+        bool empty() const;
+        
         std::array<bool, sMaxCodeBitsLength>       _symbolListByBitsHeadExistenceArray;
         std::array<SymbolType, sMaxCodeBitsLength> _symbolListByBitsHeadArray;
         

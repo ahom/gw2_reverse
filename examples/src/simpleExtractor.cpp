@@ -9,12 +9,10 @@
 
 int main(int argc, char* argv[])
 {
-    std::cout << "Allo" << std::endl;
     const uint32_t aBufferSize = 1024 * 1024 * 30; // We make the assumption that no file is bigger than 30 M
 
-    auto pANDatInterface = gw2dt::interface::createANDatInterface("D:\\projects\\data\\Gw2.dat");
-    
-    std::cout << "Allo" << std::endl;
+    auto pANDatInterface = gw2dt::interface::createANDatInterface("D:\\GuildWars2\\Gw2.dat");
+
     auto aFileRecordVect = pANDatInterface->getFileRecordVect();
     
     uint8_t* pOriBuffer = new uint8_t[aBufferSize];
@@ -25,12 +23,12 @@ int main(int argc, char* argv[])
         uint32_t aOriSize = aBufferSize;
         pANDatInterface->getBuffer(*it, aOriSize, pOriBuffer);
         
-        std::cout << "Decompressing File " << it->fileId << std::endl;
+        std::cout << "Processing File " << it->fileId << std::endl;
 
-        std::ofstream aOFStream;
-        std::ostringstream oss;
-        oss << "D:\\unpack\\" << it->fileId;
-        aOFStream.open(oss.str().c_str(), std::ios::binary | std::ios::out);
+        //std::ofstream aOFStream;
+        //std::ostringstream oss;
+        //oss << "D:\\gw2Unpack\\" << it->fileId;
+        //aOFStream.open(oss.str().c_str(), std::ios::binary | std::ios::out);
 
         if (aOriSize == aBufferSize)
         {
@@ -44,7 +42,7 @@ int main(int argc, char* argv[])
             try
             {
                 gw2dt::compression::inflateDatFileBuffer(aOriSize, pOriBuffer, aInfSize, pInfBuffer);
-                aOFStream.write(reinterpret_cast<const char*>(pInfBuffer), aInfSize);
+                //aOFStream.write(reinterpret_cast<const char*>(pInfBuffer), aInfSize);
             }
             catch(std::exception& iException)
             {
@@ -53,10 +51,10 @@ int main(int argc, char* argv[])
         }
         else
         {
-            aOFStream.write(reinterpret_cast<const char*>(pOriBuffer), aOriSize);
+            //aOFStream.write(reinterpret_cast<const char*>(pOriBuffer), aOriSize);
         }
 
-        aOFStream.close();
+        //aOFStream.close();
     }
 
     delete[] pOriBuffer;

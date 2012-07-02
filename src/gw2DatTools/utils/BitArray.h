@@ -12,18 +12,18 @@ template <typename IntType>
 class BitArray
 {
     public:
-        BitArray(const uint8_t* ipBuffer, uint32_t iSize);
+        BitArray(const uint8_t* ipBuffer, uint32_t iSize, uint32_t iSkippedBytes = 0);
         
         template <typename OutputType>
-        void readLazy(OutputType& oValue, uint8_t iBitNumber) const;
-        template <typename OutputType, uint8_t isBitNumber>
+        void readLazy(uint8_t iBitNumber, OutputType& oValue) const;
+        template <uint8_t isBitNumber, typename OutputType>
         void readLazy(OutputType& oValue) const;
         template <typename OutputType>
         void readLazy(OutputType& oValue) const;
         
         template <typename OutputType>
-        void read(OutputType& oValue, uint8_t iBitNumber) const;
-        template <typename OutputType, uint8_t isBitNumber>
+        void read(uint8_t iBitNumber, OutputType& oValue) const;
+        template <uint8_t isBitNumber, typename OutputType>
         void read(OutputType& oValue) const;
         template <typename OutputType>
         void read(OutputType& oValue) const;
@@ -36,13 +36,16 @@ class BitArray
         
     private:
         template <typename OutputType>
-        void readImpl(OutputType& oValue, uint8_t iBitNumber) const;
+        void readImpl(uint8_t iBitNumber, OutputType& oValue) const;
         void dropImpl(uint8_t iBitNumber);
         
         void pull(IntType& oValue, uint8_t& oNbPulledBits);
         
+        const uint8_t* const _pBufferStartPos;
         const uint8_t* _pBufferPos;
         uint32_t _bytesAvail;
+
+        uint32_t _skippedBytes;
         
         IntType _head;
         IntType _buffer;

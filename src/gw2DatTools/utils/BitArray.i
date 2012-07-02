@@ -11,9 +11,11 @@ namespace utils
 {
 
 template <typename IntType>
-BitArray<IntType>::BitArray(const uint8_t* ipBuffer, uint32_t iSize) :
+BitArray<IntType>::BitArray(const uint8_t* ipBuffer, uint32_t iSize, uint32_t iSkippedBytes) :
+    _pBufferStartPos(ipBuffer),
     _pBufferPos(ipBuffer),
     _bytesAvail(iSize),
+    _skippedBytes(iSkippedBytes),
     _head(0),
     _buffer(0),
     _bitsAvail(0)
@@ -28,6 +30,14 @@ void BitArray<IntType>::pull(IntType& oValue, uint8_t& oNbPulledBits)
 {
     if (_bytesAvail >= sizeof(IntType))
     {
+        if (_skippedBytes != 0)
+        {
+            if ((((_pBufferPos - _pBufferStartPos)/sizeof(IntType)) + 1) % _skippedBytes == 0)
+            {
+                _bytesAvail -= sizeof(IntType);
+                _pBufferPos += sizeof(IntType);
+            }
+        }
         oValue = *(reinterpret_cast<const IntType*>(_pBufferPos));
         _bytesAvail -= sizeof(IntType);
         _pBufferPos += sizeof(IntType);
@@ -42,14 +52,14 @@ void BitArray<IntType>::pull(IntType& oValue, uint8_t& oNbPulledBits)
 
 template <typename IntType>
 template <typename OutputType>
-void BitArray<IntType>::readImpl(OutputType& oValue, uint8_t iBitNumber) const
+void BitArray<IntType>::readImpl(uint8_t iBitNumber, OutputType& oValue) const
 {
     oValue = (_head >> ((sizeof(IntType) * 8) - iBitNumber));
 }
 
 template <typename IntType>
 template <typename OutputType>
-void BitArray<IntType>::readLazy(OutputType& oValue, uint8_t iBitNumber) const
+void BitArray<IntType>::readLazy(uint8_t iBitNumber, OutputType& oValue) const
 {
     if (iBitNumber > sizeof(OutputType) * 8)
     {
@@ -60,53 +70,53 @@ void BitArray<IntType>::readLazy(OutputType& oValue, uint8_t iBitNumber) const
         throw exception::Exception("Invalid number of bits requested.");
     }
     
-    readImpl(oValue, iBitNumber);
+    readImpl(iBitNumber, oValue);
 }
 
 template <typename IntType>
-template <typename OutputType, uint8_t isBitNumber>
+template <uint8_t isBitNumber, typename OutputType>
 void BitArray<IntType>::readLazy(OutputType& oValue) const
 {
     static_assert(isBitNumber <= sizeof(OutputType) * 8, "isBitNumber must be inferior to the size of the requested type.");
     static_assert(isBitNumber <= sizeof(IntType) * 8, "isBitNumber must be inferior to the size of the internal type.");
     
-    readImpl(oValue, isBitNumber);
+    readImpl(isBitNumber, oValue);
 }
 
 template <typename IntType>
 template <typename OutputType>
 void BitArray<IntType>::readLazy(OutputType& oValue) const
 {
-    readLazy<OutputType, sizeof(OutputType) * 8>(oValue);
+    readLazy<sizeof(OutputType) * 8>(oValue);
 }
 
 template <typename IntType>
 template <typename OutputType>
-void BitArray<IntType>::read(OutputType& oValue, uint8_t iBitNumber) const
+void BitArray<IntType>::read(uint8_t iBitNumber, OutputType& oValue) const
 {
     if (_bitsAvail < iBitNumber)
     {
         throw exception::Exception("Not enough bits available to read the value.");
     }
-    readLazy(oValue, iBitNumber);
+    readLazy(iBitNumber, oValue);
 }
 
 template <typename IntType>
-template <typename OutputType, uint8_t isBitNumber>
+template <uint8_t isBitNumber, typename OutputType>
 void BitArray<IntType>::read(OutputType& oValue) const
 {
     if (_bitsAvail < isBitNumber)
     {
         throw exception::Exception("Not enough bits available to read the value.");
     }
-    readLazy<OutputType, isBitNumber>(oValue);
+    readLazy<isBitNumber>(oValue);
 }
 
 template <typename IntType>
 template <typename OutputType>
 void BitArray<IntType>::read(OutputType& oValue) const
 {
-    read<OutputType, sizeof(OutputType) * 8>(oValue);
+    read<sizeof(OutputType) * 8>(oValue);
 }
 
 template <typename IntType>

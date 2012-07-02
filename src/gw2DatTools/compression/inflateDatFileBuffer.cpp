@@ -26,7 +26,7 @@ typedef HuffmanTreeBuilder<uint16_t, sDatFileMaxCodeBitsLength, sDatFileMaxSymbo
 static DatFileHuffmanTree sDatFileHuffmanTreeDict;
 
 // Parse and build a huffmanTree
-void parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHuffmanTree, DatFileHuffmanTreeBuilder& ioHuffmanTreeBuilder)
+bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHuffmanTree, DatFileHuffmanTreeBuilder& ioHuffmanTreeBuilder)
 {
     // Reading the number of symbols to read
     uint16_t aNumberOfSymbols;
@@ -67,17 +67,17 @@ void parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
         }
     }
     
-    ioHuffmanTreeBuilder.buildHuffmanTree(ioHuffmanTree);
+    return ioHuffmanTreeBuilder.buildHuffmanTree(ioHuffmanTree);
 }
 
-void inflatedata(DatFileBitArray& ioInputBitArray, const uint32_t iOutputSize,  uint8_t* ioOutputTab)
+void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_t* ioOutputTab)
 {
     uint32_t anOutputPos = 0;
 
     // Reading the const write size addition value
     ioInputBitArray.drop<4>();
     uint16_t aWriteSizeConstAdd;
-    ioInputBitArray.read<uint16_t, 4>(aWriteSizeConstAdd);
+    ioInputBitArray.read<4>(aWriteSizeConstAdd);
     aWriteSizeConstAdd += 1;
     ioInputBitArray.drop<4>();
 
@@ -90,12 +90,15 @@ void inflatedata(DatFileBitArray& ioInputBitArray, const uint32_t iOutputSize,  
     while (anOutputPos < iOutputSize)
     {
         // Reading HuffmanTrees
-        parseHuffmanTree(ioInputBitArray, aHuffmanTreeSymbol, aHuffmanTreeBuilder);
-        parseHuffmanTree(ioInputBitArray, aHuffmanTreeCopy, aHuffmanTreeBuilder);
+        if (   !parseHuffmanTree(ioInputBitArray, aHuffmanTreeSymbol, aHuffmanTreeBuilder)
+            || !parseHuffmanTree(ioInputBitArray, aHuffmanTreeCopy, aHuffmanTreeBuilder))
+        {
+            break;
+        }
 
         // Reading MaxCount
         uint32_t aMaxCount;
-        ioInputBitArray.read<uint32_t, 4>(aMaxCount);
+        ioInputBitArray.read<4>(aMaxCount);
         aMaxCount = (aMaxCount + 1) << 12;
         ioInputBitArray.drop<4>();
 
@@ -147,7 +150,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, const uint32_t iOutputSize,  
             {
                 uint8_t aWriteSizeAddBits = aCodeDiv4.quot - 1;
                 uint32_t aWriteSizeAdd;
-                ioInputBitArray.read(aWriteSizeAdd, aWriteSizeAddBits);
+                ioInputBitArray.read(aWriteSizeAddBits, aWriteSizeAdd);
                 aWriteSize |= aWriteSizeAdd;
                 ioInputBitArray.drop(aWriteSizeAddBits);
             }
@@ -178,8 +181,8 @@ void inflatedata(DatFileBitArray& ioInputBitArray, const uint32_t iOutputSize,  
             {
                 uint8_t aWriteOffsetAddBits = aCodeDiv2.quot - 1;
                 uint32_t aWriteOffsetAdd;
-                ioInputBitArray.read(aWriteOffsetAdd, aWriteOffsetAddBits);
-                aWriteSize |= aWriteOffsetAdd;
+                ioInputBitArray.read(aWriteOffsetAddBits, aWriteOffsetAdd);
+                aWriteOffset |= aWriteOffsetAdd;
                 ioInputBitArray.drop(aWriteOffsetAddBits);
             }
             aWriteOffset += 1;
@@ -214,7 +217,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInp
 
     try
     {
-        dat::DatFileBitArray anInputBitArray(iInputTab, iInputSize);
+        dat::DatFileBitArray anInputBitArray(iInputTab, iInputSize, 16384); // Skipping four bytes every 65k chunk
 
         // Skipping header & Getting size of the uncompressed data
         anInputBitArray.drop<uint32_t>();
