@@ -29,7 +29,7 @@ struct HuffmanTree
 
 struct State
 {
-    uint32_t* input;
+    const uint32_t* input;
     uint32_t inputSize;
     uint32_t inputPos;
 
