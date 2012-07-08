@@ -186,7 +186,7 @@ void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vec
 			++aPixelBlockPos;
 		}
 
-		while (ioColorBitMap[aPixelBlockPos] && aPixelBlockPos < iFullFormat.nbObPixelBlocks)
+		while (aPixelBlockPos < iFullFormat.nbObPixelBlocks && ioColorBitMap[aPixelBlockPos])
 		{
 			++aPixelBlockPos;
 		}
@@ -236,7 +236,7 @@ void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitM
 			++aPixelBlockPos;
 		}
 
-		while (ioAlphaBitMap[aPixelBlockPos] && aPixelBlockPos < iFullFormat.nbObPixelBlocks)
+		while (aPixelBlockPos < iFullFormat.nbObPixelBlocks && ioAlphaBitMap[aPixelBlockPos])
 		{
 			++aPixelBlockPos;
 		}
@@ -283,7 +283,7 @@ void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitM
 			++aPixelBlockPos;
 		}
 
-		while (ioAlphaBitMap[aPixelBlockPos] && aPixelBlockPos < iFullFormat.nbObPixelBlocks)
+		while (aPixelBlockPos < iFullFormat.nbObPixelBlocks && ioAlphaBitMap[aPixelBlockPos])
 		{
 			++aPixelBlockPos;
 		}
@@ -534,7 +534,7 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
 			++aPixelBlockPos;
 		}
 
-		while (ioColorBitMap[aPixelBlockPos] && aPixelBlockPos < iFullFormat.nbObPixelBlocks)
+		while (aPixelBlockPos < iFullFormat.nbObPixelBlocks && ioColorBitMap[aPixelBlockPos])
 		{
 			++aPixelBlockPos;
 		}
@@ -639,7 +639,7 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
 }
 }
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(const uint32_t iInputSize, uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
+GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
 {
     if (iInputTab == nullptr)
     {
@@ -664,7 +664,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(const uin
         
         // Initialize state
         State aState;
-        aState.input = reinterpret_cast<uint32_t*>(iInputTab);
+        aState.input = reinterpret_cast<const uint32_t*>(iInputTab);
         aState.inputSize = iInputSize / 4;
         aState.inputPos = 0;
 
@@ -702,6 +702,99 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(const uin
 
 		aFullFormat.bytesPerComponent = aFullFormat.bytesPerPixelBlock / (aFullFormat.hasTwoComponents ? 2 : 1);
 		
+		uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
+
+		if (ioOutputSize != 0 && ioOutputSize < anOutputSize)
+        {
+            throw exception::Exception("Output buffer is too small.");
+        }
+
+        ioOutputSize = anOutputSize;
+
+        if (ioOutputTab == nullptr)
+        {
+            anOutputTab = static_cast<uint8_t*>(malloc(sizeof(uint8_t) * anOutputSize));
+        }
+        else
+        {
+            isOutputTabOwned = false;
+            anOutputTab = ioOutputTab;
+        }
+
+		texture::inflateData(aState, aFullFormat, ioOutputSize, anOutputTab);
+        
+        return anOutputTab;
+    }
+    catch(exception::Exception& iException)
+    {
+        if (isOutputTabOwned)
+        {
+            free(anOutputTab);
+        }
+        throw iException; // Rethrow exception
+    }
+    catch(std::exception& iException)
+    {
+        if (isOutputTabOwned)
+        {
+            free(anOutputTab);
+        }
+        throw iException; // Rethrow exception
+    }
+}
+
+GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab, 
+    uint32_t& ioOutputSize, uint8_t* ioOutputTab)
+{
+    if (iInputTab == nullptr)
+    {
+        throw exception::Exception("Input buffer is null.");
+    }
+
+    if (ioOutputTab != nullptr && ioOutputSize == 0)
+    {
+        throw exception::Exception("Output buffer is not null and outputSize is not defined.");
+    }
+
+    uint8_t* anOutputTab(nullptr);
+    bool isOutputTabOwned(true);
+
+    try
+    {
+        if (!texture::sStaticValuesInitialized)
+        {
+            texture::initializeStaticValues();
+            texture::sStaticValuesInitialized = true;
+        }
+
+        // Initialize format
+		texture::FullFormat aFullFormat;
+
+		aFullFormat.format = texture::deduceFormat(iFormatFourCc);
+        aFullFormat.width  = iWidth;
+        aFullFormat.height = iHeight;
+
+        aFullFormat.nbObPixelBlocks = ((aFullFormat.width + 3) / 4) * ((aFullFormat.height + 3) / 4);
+        aFullFormat.bytesPerPixelBlock = (aFullFormat.format.pixelSizeInBits * 4 * 4) / 8;
+        aFullFormat.hasTwoComponents = 
+            ((aFullFormat.format.flags & (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA)) == (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA))
+            || (aFullFormat.format.flags & texture::FF_BICOLORCOMP);
+
+        aFullFormat.bytesPerComponent = aFullFormat.bytesPerPixelBlock / (aFullFormat.hasTwoComponents ? 2 : 1);
+        
+        // Initialize state
+        State aState;
+        aState.input = reinterpret_cast<const uint32_t*>(iInputTab);
+        aState.inputSize = iInputSize / 4;
+        aState.inputPos = 0;
+
+        aState.head = 0;
+        aState.bits = 0;
+        aState.buffer = 0;
+
+		aState.isEmpty = false;
+
+        // Allocate output buffer
 		uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
 
 		if (ioOutputSize != 0 && ioOutputSize < anOutputSize)
