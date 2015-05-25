@@ -17,32 +17,32 @@ namespace interface
 
 class ANDatInterfaceImpl : public ANDatInterface
 {
-    public:
-        ANDatInterfaceImpl(const char* iDatPath, std::unique_ptr<format::Mft>& ipMft, std::unique_ptr<format::Mapping>& ipMapping);
-        virtual ~ANDatInterfaceImpl();
-        
-        virtual void getBuffer(const ANDatInterface::FileRecord& iFileRecord, uint32_t& ioOutputSize, uint8_t* ioBuffer);
-        
-        virtual const FileRecord& getFileRecordForFileId(const uint32_t& iFileId) const;
-        virtual const FileRecord& getFileRecordForBaseId(const uint32_t& iBaseId) const;
-        
-        virtual const std::vector<FileRecord>& getFileRecordVect() const;
-        
-        void computeInternalData();
-        
-    private:
-        std::ifstream _datStream;
-        
-        // Helper data structures
-        std::unordered_map<uint32_t, FileRecord*> _fileIdDict;
-        std::unordered_map<uint32_t, FileRecord*> _baseIdDict;
-        
-        // Computed data structures
-        std::vector<FileRecord> _fileRecordVect;
-        
-        // Raw data structures
-        std::unique_ptr<format::Mft> _pMft;
-        std::unique_ptr<format::Mapping> _pMapping;
+public:
+    ANDatInterfaceImpl(const char* iDatPath, std::unique_ptr<format::Mft>& ipMft, std::unique_ptr<format::Mapping>& ipMapping);
+    virtual ~ANDatInterfaceImpl();
+
+    virtual void getBuffer(const ANDatInterface::FileRecord& iFileRecord, uint32_t& ioOutputSize, uint8_t* ioBuffer);
+
+    virtual const FileRecord& getFileRecordForFileId(const uint32_t& iFileId) const;
+    virtual const FileRecord& getFileRecordForBaseId(const uint32_t& iBaseId) const;
+
+    virtual const std::vector<FileRecord>& getFileRecordVect() const;
+
+    void computeInternalData();
+
+private:
+    std::ifstream _datStream;
+
+    // Helper data structures
+    std::unordered_map<uint32_t, FileRecord*> _fileIdDict;
+    std::unordered_map<uint32_t, FileRecord*> _baseIdDict;
+
+    // Computed data structures
+    std::vector<FileRecord> _fileRecordVect;
+
+    // Raw data structures
+    std::unique_ptr<format::Mft> _pMft;
+    std::unique_ptr<format::Mapping> _pMapping;
 };
 
 ANDatInterfaceImpl::ANDatInterfaceImpl(const char* iDatPath, std::unique_ptr<format::Mft>& ipMft, std::unique_ptr<format::Mapping>& ipMapping) :
@@ -113,14 +113,14 @@ void ANDatInterfaceImpl::computeInternalData()
     _fileIdDict.clear();
     _baseIdDict.clear();
     _fileRecordVect.clear();
-    
+
     _fileRecordVect.resize(_pMapping->entries.size());
-    
+
     std::unordered_map<uint32_t, FileRecord*> aMftIndexDictHelper;
     aMftIndexDictHelper.rehash(_pMapping->entries.size());
-    
+
     uint32_t aCurrentIndex(0);
-    
+
     for (auto itMapping = _pMapping->entries.begin(); itMapping != _pMapping->entries.end(); ++itMapping)
     {
         if (itMapping->mftIndex == 0 && itMapping->id == 0)
@@ -133,7 +133,7 @@ void ANDatInterfaceImpl::computeInternalData()
             if (itMftDict != aMftIndexDictHelper.end())
             {
                 FileRecord* pFileRecord = itMftDict->second;
-                
+
                 if (itMapping->id < pFileRecord->fileId)
                 {
                     pFileRecord->baseId = itMapping->id;
@@ -149,31 +149,31 @@ void ANDatInterfaceImpl::computeInternalData()
                 FileRecord& aFileRecord = _fileRecordVect[aCurrentIndex];
                 ++aCurrentIndex;
                 format::MftEntry& aMftEntry = _pMft->entries[itMapping->mftIndex - 1];
-                
+
                 aFileRecord.offset = aMftEntry.offset;
                 aFileRecord.size = aMftEntry.size;
-                
+
                 aFileRecord.baseId = 0;
                 aFileRecord.fileId = itMapping->id;
-                
+
                 aFileRecord.isCompressed = (aMftEntry.compressionFlag != 0);
-                
+
                 aMftIndexDictHelper.insert(std::make_pair(itMapping->mftIndex, &aFileRecord));
             }
         }
     }
-    
+
     // Dropping the unecessary entries
     _fileRecordVect.resize(aCurrentIndex);
-    
+
     // Reserving space for dicts
     _fileIdDict.rehash(_fileRecordVect.size());
     _baseIdDict.rehash(_fileRecordVect.size());
-    
+
     for (auto itFileRecord = _fileRecordVect.begin(); itFileRecord != _fileRecordVect.end(); ++itFileRecord)
     {
         _fileIdDict.insert(std::make_pair(itFileRecord->fileId, &(*itFileRecord)));
-        
+
         if (itFileRecord->baseId != 0)
         {
             _baseIdDict.insert(std::make_pair(itFileRecord->baseId, &(*itFileRecord)));
@@ -185,13 +185,13 @@ GW2DATTOOLS_API std::unique_ptr<ANDatInterface> GW2DATTOOLS_APIENTRY createANDat
 {
     std::ifstream aDatStream(iDatPath, std::ios::binary);
     auto pANDat = format::parseANDat(aDatStream, 0, 0);
-    
+
     auto pMft = format::parseMft(aDatStream, pANDat->header.mftOffset, pANDat->header.mftSize);
     auto pMapping = format::parseMapping(aDatStream, pMft->entries[1].offset, pMft->entries[1].size);
-    
+
     auto pANDatInterfaceImpl = std::unique_ptr<ANDatInterfaceImpl>(new ANDatInterfaceImpl(iDatPath, pMft, pMapping));
     pANDatInterfaceImpl->computeInternalData();
-    
+
     return std::move(pANDatInterfaceImpl);
 }
 

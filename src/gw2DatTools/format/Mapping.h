@@ -21,7 +21,7 @@ struct MappingEntry
 
 struct Mapping
 {
-   std::vector<MappingEntry> entries;
+    std::vector<MappingEntry> entries;
 };
 
 std::unique_ptr<Mapping> parseMapping(std::istream& iStream, const uint64_t& iOffset, const uint32_t iSize);

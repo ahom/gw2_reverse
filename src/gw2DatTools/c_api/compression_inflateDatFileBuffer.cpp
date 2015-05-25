@@ -6,7 +6,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY compression_inflateDatFileBuffer(const uint32_t iInputSize, uint8_t* iInputTab, uint32_t* ioOutputSize, uint8_t* ioOutputTab)
 {
@@ -15,7 +15,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY compression_inflateDatFileBuffer(c
         printf("GW2DATTOOLS_C_API(compression_inflateDatFileBuffer): ioOutputSize is NULL.");
         return NULL;
     }
-    
+
     try
     {
         return gw2dt::compression::inflateDatFileBuffer(iInputSize, iInputTab, *ioOutputSize, ioOutputTab == NULL ? nullptr : ioOutputTab);
@@ -29,4 +29,4 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY compression_inflateDatFileBuffer(c
 
 #ifdef __cplusplus
 }
-#endif 
+#endif

@@ -8,7 +8,7 @@ namespace compression
 {
 
 void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode)
-{    
+{
     if (iHuffmanTree.isEmpty)
     {
         throw exception::Exception("Trying to read code from an empty HuffmanTree.");
@@ -126,7 +126,7 @@ void fillWorkingTabsHelper(const uint8_t iBits, const int16_t iSymbol, int16_t* 
     {
         throw exception::Exception("Too many bits.");
     }
-    
+
     if (iSymbol >= MaxSymbolValue)
     {
         throw exception::Exception("Too high symbol.");

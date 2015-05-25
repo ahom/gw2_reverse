@@ -14,15 +14,15 @@ int main(int argc, char* argv[])
     auto pANDatInterface = gw2dt::interface::createANDatInterface("D:\\GuildWars2\\Gw2.dat");
 
     auto aFileRecordVect = pANDatInterface->getFileRecordVect();
-    
+
     uint8_t* pOriBuffer = new uint8_t[aBufferSize];
     uint8_t* pInfBuffer = new uint8_t[aBufferSize];
-    
+
     for (auto it = aFileRecordVect.begin(); it != aFileRecordVect.end(); ++it)
     {
         uint32_t aOriSize = aBufferSize;
         pANDatInterface->getBuffer(*it, aOriSize, pOriBuffer);
-        
+
         std::cout << "Processing File " << it->fileId << std::endl;
 
         //std::ofstream aOFStream;
@@ -34,11 +34,11 @@ int main(int argc, char* argv[])
         {
             std::cout << "File " << it->fileId << " has a size greater than (or equal to) 30Mo." << std::endl;
         }
-        
+
         if (it->isCompressed)
         {
             uint32_t aInfSize = aBufferSize;
-            
+
             try
             {
                 gw2dt::compression::inflateDatFileBuffer(aOriSize, pOriBuffer, aInfSize, pInfBuffer);
@@ -59,6 +59,6 @@ int main(int argc, char* argv[])
 
     delete[] pOriBuffer;
     delete[] pInfBuffer;
-    
+
     return 0;
 };

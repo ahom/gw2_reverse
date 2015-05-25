@@ -8,7 +8,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /** @Inputs:
  *    - iInputSize: Size of the input buffer
@@ -26,6 +26,6 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY compression_inflateBuffer(const ui
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif // GW2DATTOOLS_CAPI_COMPRESSION_INFLATEBUFFER_H

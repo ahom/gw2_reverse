@@ -17,13 +17,13 @@ struct MftHeader
     uint8_t  magic[4];
     uint64_t unknown1;
     uint32_t nbOfEntries;
-	uint32_t unknown2;
-	uint32_t unknown3;
+    uint32_t unknown2;
+    uint32_t unknown3;
 };
 
 struct MftEntry
 {
-    uint64_t offset; 
+    uint64_t offset;
     uint32_t size;
     uint16_t compressionFlag;
     uint16_t unknown1;
@@ -34,8 +34,8 @@ struct MftEntry
 
 struct Mft
 {
-   MftHeader header;
-   std::vector<MftEntry> entries;
+    MftHeader header;
+    std::vector<MftEntry> entries;
 };
 
 std::unique_ptr<Mft> parseMft(std::istream& iStream, const uint64_t& iOffset, const uint32_t iSize);

@@ -46,7 +46,7 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
     while (aRemainingSymbols >= 0)
     {
         uint16_t aCode;
-        
+
         sDatFileHuffmanTreeDict.readCode(ioInputBitArray, aCode);
 
         uint8_t aCodeNumberOfBits = aCode & 0x1F;
@@ -66,7 +66,7 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
             }
         }
     }
-    
+
     return ioHuffmanTreeBuilder.buildHuffmanTree(ioHuffmanTree);
 }
 
@@ -84,14 +84,14 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
     // Declaring our HuffmanTrees
     DatFileHuffmanTree aHuffmanTreeSymbol;
     DatFileHuffmanTree aHuffmanTreeCopy;
-    
+
     DatFileHuffmanTreeBuilder aHuffmanTreeBuilder;
 
     while (anOutputPos < iOutputSize)
     {
         // Reading HuffmanTrees
         if (   !parseHuffmanTree(ioInputBitArray, aHuffmanTreeSymbol, aHuffmanTreeBuilder)
-            || !parseHuffmanTree(ioInputBitArray, aHuffmanTreeCopy, aHuffmanTreeBuilder))
+                || !parseHuffmanTree(ioInputBitArray, aHuffmanTreeCopy, aHuffmanTreeBuilder))
         {
             break;
         }
@@ -105,7 +105,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
         uint32_t aCurrentCodeReadCount = 0;
 
         while ((aCurrentCodeReadCount < aMaxCount) &&
-               (anOutputPos < iOutputSize))
+                (anOutputPos < iOutputSize))
         {
             ++aCurrentCodeReadCount;
 
@@ -189,7 +189,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
 
             uint32_t anAlreadyWritten = 0;
             while ((anAlreadyWritten < aWriteSize) &&
-                   (anOutputPos < iOutputSize))
+                    (anOutputPos < iOutputSize))
             {
                 ioOutputTab[anOutputPos] = ioOutputTab[anOutputPos - aWriteOffset];
                 ++anOutputPos;
@@ -221,7 +221,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInp
 
         // Skipping header & Getting size of the uncompressed data
         anInputBitArray.drop<uint32_t>();
-        
+
         // Getting size of the uncompressed data
         uint32_t anOutputSize;
         anInputBitArray.read(anOutputSize);
@@ -245,7 +245,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInp
         }
 
         dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
-        
+
         return anOutputTab;
     }
     catch(exception::Exception& iException)
@@ -268,8 +268,8 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInp
 
 class DatFileHuffmanTreeDictStaticInitializer
 {
-    public:
-        DatFileHuffmanTreeDictStaticInitializer(dat::DatFileHuffmanTree& ioHuffmanTree);
+public:
+    DatFileHuffmanTreeDictStaticInitializer(dat::DatFileHuffmanTree& ioHuffmanTree);
 };
 
 DatFileHuffmanTreeDictStaticInitializer::DatFileHuffmanTreeDictStaticInitializer(dat::DatFileHuffmanTree& ioHuffmanTree)

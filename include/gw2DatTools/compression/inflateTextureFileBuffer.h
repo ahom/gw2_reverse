@@ -46,8 +46,8 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t 
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab, 
-    uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
+        uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 }
 }
 
